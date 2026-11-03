@@ -1,0 +1,314 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Defs_Solucao" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Claude" exporterVersion="1.0">
+  <bpmn:dataStore id="Store_Base" name="Base integrada NuPay + cartão" />
+  <bpmn:dataStore id="Store_Regras" name="Repositório de regras versionadas" />
+  <bpmn:collaboration id="Collab_Solucao">
+    <bpmn:participant id="P_Estab" name="Estabelecimento parceiro" />
+    <bpmn:participant id="P_Cli" name="Cliente" />
+    <bpmn:participant id="P_Nubank" name="Nubank — Sistema integrado NuPay e cartão (proposta)" processRef="Proc_Solucao" />
+    <bpmn:messageFlow id="MF1" name="Pedido de pagamento (NuPay)" sourceRef="P_Estab" targetRef="S_Pedido" />
+    <bpmn:messageFlow id="MF2" name="Ofertas e condições" sourceRef="T_Exibir" targetRef="P_Cli" />
+    <bpmn:messageFlow id="MF3" name="Escolha e confirmação" sourceRef="P_Cli" targetRef="I_Resp" />
+    <bpmn:messageFlow id="MF4" name="Pagamento confirmado" sourceRef="T_ConfE" targetRef="P_Estab" />
+  </bpmn:collaboration>
+  <bpmn:process id="Proc_Solucao" name="Ofertas e regras coordenadas entre NuPay e cartão" isExecutable="false">
+    <bpmn:laneSet id="LaneSet_Solucao">
+      <bpmn:lane id="L_NP" name="NuPay (checkout e app)">
+        <bpmn:flowNodeRef>S_Pedido</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_Sol</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_Exibir</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>I_Resp</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>X_Conf</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>E_Nao</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>X_Mod</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_Deb</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>X_Merge</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_ConfE</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="L_SI" name="SI integrado (dados e regras)">
+        <bpmn:flowNodeRef>T_Cons</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_Regras</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_Ofertas</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_Reg</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>E_Compra</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_Painel</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_Sim</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>X_Coer</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_Pub</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>E_Pub</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="L_CC" name="Cartão de crédito">
+        <bpmn:flowNodeRef>T_Fat</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="L_GT" name="Gestão de taxas e risco">
+        <bpmn:flowNodeRef>S_Ciclo</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_Anal</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>X_Aj</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>E_Mant</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>X_M2</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_Prop</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_Apr</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="S_Pedido" name="Pedido de pagamento recebido">
+      <bpmn:outgoing>F01</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MED_S_Pedido" />
+    </bpmn:startEvent>
+    <bpmn:serviceTask id="T_Sol" name="Solicitar oferta integrada">
+      <bpmn:incoming>F01</bpmn:incoming>
+      <bpmn:outgoing>F02</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="T_Cons" name="Consultar a visão integrada do cliente">
+      <bpmn:incoming>F02</bpmn:incoming>
+      <bpmn:outgoing>F03</bpmn:outgoing>
+      <bpmn:property id="Prop_DA1" name="__targetRef_placeholder" />
+      <bpmn:dataInputAssociation id="DA1"><bpmn:sourceRef>DS_Base1</bpmn:sourceRef><bpmn:targetRef>Prop_DA1</bpmn:targetRef></bpmn:dataInputAssociation>
+    </bpmn:serviceTask>
+    <bpmn:businessRuleTask id="T_Regras" name="Aplicar regras vigentes (taxas, prazos, elegibilidade)">
+      <bpmn:incoming>F03</bpmn:incoming>
+      <bpmn:outgoing>F04</bpmn:outgoing>
+      <bpmn:property id="Prop_DA2" name="__targetRef_placeholder" />
+      <bpmn:dataInputAssociation id="DA2"><bpmn:sourceRef>DS_Regras1</bpmn:sourceRef><bpmn:targetRef>Prop_DA2</bpmn:targetRef></bpmn:dataInputAssociation>
+    </bpmn:businessRuleTask>
+    <bpmn:serviceTask id="T_Ofertas" name="Montar ofertas e condições coerentes">
+      <bpmn:incoming>F04</bpmn:incoming>
+      <bpmn:outgoing>F05</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sendTask id="T_Exibir" name="Exibir as modalidades no app">
+      <bpmn:incoming>F05</bpmn:incoming>
+      <bpmn:outgoing>F06</bpmn:outgoing>
+    </bpmn:sendTask>
+    <bpmn:intermediateCatchEvent id="I_Resp" name="Resposta do cliente">
+      <bpmn:incoming>F06</bpmn:incoming>
+      <bpmn:outgoing>F07</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MED_I_Resp" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:exclusiveGateway id="X_Conf" name="Cliente confirmou?" default="F09">
+      <bpmn:incoming>F07</bpmn:incoming>
+      <bpmn:outgoing>F08</bpmn:outgoing>
+      <bpmn:outgoing>F09</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:endEvent id="E_Nao" name="Compra não concluída">
+      <bpmn:incoming>F09</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:exclusiveGateway id="X_Mod" name="Modalidade?" default="F10">
+      <bpmn:incoming>F08</bpmn:incoming>
+      <bpmn:outgoing>F10</bpmn:outgoing>
+      <bpmn:outgoing>F11</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:serviceTask id="T_Deb" name="Debitar o saldo da conta">
+      <bpmn:incoming>F10</bpmn:incoming>
+      <bpmn:outgoing>F12</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="T_Fat" name="Lançar a compra e as parcelas na fatura">
+      <bpmn:incoming>F11</bpmn:incoming>
+      <bpmn:outgoing>F13</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="X_Merge">
+      <bpmn:incoming>F12</bpmn:incoming>
+      <bpmn:incoming>F13</bpmn:incoming>
+      <bpmn:outgoing>F14</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sendTask id="T_ConfE" name="Confirmar o pagamento ao estabelecimento">
+      <bpmn:incoming>F14</bpmn:incoming>
+      <bpmn:outgoing>F15</bpmn:outgoing>
+    </bpmn:sendTask>
+    <bpmn:serviceTask id="T_Reg" name="Registrar a transação na visão integrada">
+      <bpmn:incoming>F15</bpmn:incoming>
+      <bpmn:outgoing>F16</bpmn:outgoing>
+      <bpmn:dataOutputAssociation id="DA3"><bpmn:targetRef>DS_Base2</bpmn:targetRef></bpmn:dataOutputAssociation>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="E_Compra" name="Compra concluída e visão atualizada">
+      <bpmn:incoming>F16</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:startEvent id="S_Ciclo" name="Ciclo de revisão de regras">
+      <bpmn:outgoing>F17</bpmn:outgoing>
+      <bpmn:timerEventDefinition id="TED_S_Ciclo" />
+    </bpmn:startEvent>
+    <bpmn:serviceTask id="T_Painel" name="Gerar painel de taxas, risco e divergências">
+      <bpmn:incoming>F17</bpmn:incoming>
+      <bpmn:outgoing>F18</bpmn:outgoing>
+      <bpmn:property id="Prop_DA4" name="__targetRef_placeholder" />
+      <bpmn:dataInputAssociation id="DA4"><bpmn:sourceRef>DS_Base2</bpmn:sourceRef><bpmn:targetRef>Prop_DA4</bpmn:targetRef></bpmn:dataInputAssociation>
+    </bpmn:serviceTask>
+    <bpmn:userTask id="T_Anal" name="Analisar indicadores e comparar condições">
+      <bpmn:incoming>F18</bpmn:incoming>
+      <bpmn:outgoing>F19</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="X_Aj" name="Ajuste necessário?" default="F21">
+      <bpmn:incoming>F19</bpmn:incoming>
+      <bpmn:outgoing>F20</bpmn:outgoing>
+      <bpmn:outgoing>F21</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:endEvent id="E_Mant" name="Regras mantidas">
+      <bpmn:incoming>F21</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:exclusiveGateway id="X_M2">
+      <bpmn:incoming>F20</bpmn:incoming>
+      <bpmn:incoming>F26</bpmn:incoming>
+      <bpmn:outgoing>F22</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:userTask id="T_Prop" name="Propor ajuste de taxa ou regra">
+      <bpmn:incoming>F22</bpmn:incoming>
+      <bpmn:outgoing>F23</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="T_Sim" name="Simular e validar a coerência entre produtos">
+      <bpmn:incoming>F23</bpmn:incoming>
+      <bpmn:outgoing>F24</bpmn:outgoing>
+      <bpmn:property id="Prop_DA5" name="__targetRef_placeholder" />
+      <bpmn:dataInputAssociation id="DA5"><bpmn:sourceRef>DS_Regras2</bpmn:sourceRef><bpmn:targetRef>Prop_DA5</bpmn:targetRef></bpmn:dataInputAssociation>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="X_Coer" name="Coerente entre produtos?" default="F26">
+      <bpmn:incoming>F24</bpmn:incoming>
+      <bpmn:outgoing>F25</bpmn:outgoing>
+      <bpmn:outgoing>F26</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:userTask id="T_Apr" name="Aprovar a nova versão da regra">
+      <bpmn:incoming>F25</bpmn:incoming>
+      <bpmn:outgoing>F27</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="T_Pub" name="Versionar e publicar a regra para NuPay e cartão">
+      <bpmn:incoming>F27</bpmn:incoming>
+      <bpmn:outgoing>F28</bpmn:outgoing>
+      <bpmn:dataOutputAssociation id="DA6"><bpmn:targetRef>DS_Regras2</bpmn:targetRef></bpmn:dataOutputAssociation>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="E_Pub" name="Ofertas atualizadas de forma coordenada">
+      <bpmn:incoming>F28</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="F01" sourceRef="S_Pedido" targetRef="T_Sol" />
+    <bpmn:sequenceFlow id="F02" sourceRef="T_Sol" targetRef="T_Cons" />
+    <bpmn:sequenceFlow id="F03" sourceRef="T_Cons" targetRef="T_Regras" />
+    <bpmn:sequenceFlow id="F04" sourceRef="T_Regras" targetRef="T_Ofertas" />
+    <bpmn:sequenceFlow id="F05" sourceRef="T_Ofertas" targetRef="T_Exibir" />
+    <bpmn:sequenceFlow id="F06" sourceRef="T_Exibir" targetRef="I_Resp" />
+    <bpmn:sequenceFlow id="F07" sourceRef="I_Resp" targetRef="X_Conf" />
+    <bpmn:sequenceFlow id="F08" name="Sim" sourceRef="X_Conf" targetRef="X_Mod">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">cliente confirmou</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="F09" name="Não" sourceRef="X_Conf" targetRef="E_Nao" />
+    <bpmn:sequenceFlow id="F10" name="Débito" sourceRef="X_Mod" targetRef="T_Deb" />
+    <bpmn:sequenceFlow id="F11" name="Crédito ou limite adicional" sourceRef="X_Mod" targetRef="T_Fat">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">crédito ou limite adicional</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="F12" sourceRef="T_Deb" targetRef="X_Merge" />
+    <bpmn:sequenceFlow id="F13" sourceRef="T_Fat" targetRef="X_Merge" />
+    <bpmn:sequenceFlow id="F14" sourceRef="X_Merge" targetRef="T_ConfE" />
+    <bpmn:sequenceFlow id="F15" sourceRef="T_ConfE" targetRef="T_Reg" />
+    <bpmn:sequenceFlow id="F16" sourceRef="T_Reg" targetRef="E_Compra" />
+    <bpmn:sequenceFlow id="F17" sourceRef="S_Ciclo" targetRef="T_Painel" />
+    <bpmn:sequenceFlow id="F18" sourceRef="T_Painel" targetRef="T_Anal" />
+    <bpmn:sequenceFlow id="F19" sourceRef="T_Anal" targetRef="X_Aj" />
+    <bpmn:sequenceFlow id="F20" name="Sim" sourceRef="X_Aj" targetRef="X_M2">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">ajuste necessário</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="F21" name="Não" sourceRef="X_Aj" targetRef="E_Mant" />
+    <bpmn:sequenceFlow id="F22" sourceRef="X_M2" targetRef="T_Prop" />
+    <bpmn:sequenceFlow id="F23" sourceRef="T_Prop" targetRef="T_Sim" />
+    <bpmn:sequenceFlow id="F24" sourceRef="T_Sim" targetRef="X_Coer" />
+    <bpmn:sequenceFlow id="F25" name="Sim" sourceRef="X_Coer" targetRef="T_Apr">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">regra coerente entre produtos</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="F26" name="Não" sourceRef="X_Coer" targetRef="X_M2" />
+    <bpmn:sequenceFlow id="F27" sourceRef="T_Apr" targetRef="T_Pub" />
+    <bpmn:sequenceFlow id="F28" sourceRef="T_Pub" targetRef="E_Pub" />
+    <bpmn:dataStoreReference id="DS_Base1" name="Base integrada NuPay + cartão" dataStoreRef="Store_Base" />
+    <bpmn:dataStoreReference id="DS_Regras1" name="Regras versionadas" dataStoreRef="Store_Regras" />
+    <bpmn:dataStoreReference id="DS_Base2" name="Base integrada NuPay + cartão" dataStoreRef="Store_Base" />
+    <bpmn:dataStoreReference id="DS_Regras2" name="Regras versionadas" dataStoreRef="Store_Regras" />
+    <bpmn:textAnnotation id="A1"><bpmn:text>Crédito e limite adicional entram na mesma fatura do cartão.</bpmn:text></bpmn:textAnnotation>
+    <bpmn:association id="As_A1" sourceRef="T_Fat" targetRef="A1" />
+    <bpmn:textAnnotation id="A2"><bpmn:text>Alinhar não exige taxas idênticas: coerência com o contexto de cada produto.</bpmn:text></bpmn:textAnnotation>
+    <bpmn:association id="As_A2" sourceRef="X_Coer" targetRef="A2" />
+    <bpmn:textAnnotation id="A3"><bpmn:text>Revisão periódica ou quando um indicador sai da faixa.</bpmn:text></bpmn:textAnnotation>
+    <bpmn:association id="As_A3" sourceRef="S_Ciclo" targetRef="A3" />
+    <bpmn:textAnnotation id="A4"><bpmn:text>Processo proposto (to-be) pela consultoria; cenário hipotético, com base em informação pública.</bpmn:text></bpmn:textAnnotation>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="Diagram_Solucao" name="Solução proposta">
+    <bpmndi:BPMNPlane id="Plane_Solucao" bpmnElement="Collab_Solucao">
+      <bpmndi:BPMNShape id="P_Estab_di" bpmnElement="P_Estab" isHorizontal="true"><dc:Bounds x="150" y="100" width="3880" height="60" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="P_Cli_di" bpmnElement="P_Cli" isHorizontal="true"><dc:Bounds x="950" y="190" width="500" height="60" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="P_Nubank_di" bpmnElement="P_Nubank" isHorizontal="true"><dc:Bounds x="150" y="290" width="3880" height="740" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="L_NP_di" bpmnElement="L_NP" isHorizontal="true"><dc:Bounds x="180" y="290" width="3850" height="190" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="L_SI_di" bpmnElement="L_SI" isHorizontal="true"><dc:Bounds x="180" y="480" width="3850" height="220" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="L_CC_di" bpmnElement="L_CC" isHorizontal="true"><dc:Bounds x="180" y="700" width="3850" height="150" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="L_GT_di" bpmnElement="L_GT" isHorizontal="true"><dc:Bounds x="180" y="850" width="3850" height="180" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="S_Pedido_di" bpmnElement="S_Pedido"><dc:Bounds x="250" y="342" width="36" height="36" /><bpmndi:BPMNLabel><dc:Bounds x="210" y="384" width="116" height="40" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_Sol_di" bpmnElement="T_Sol"><dc:Bounds x="330" y="320" width="140" height="80" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_Cons_di" bpmnElement="T_Cons"><dc:Bounds x="520" y="500" width="140" height="80" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_Regras_di" bpmnElement="T_Regras"><dc:Bounds x="710" y="500" width="140" height="80" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_Ofertas_di" bpmnElement="T_Ofertas"><dc:Bounds x="900" y="500" width="140" height="80" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_Exibir_di" bpmnElement="T_Exibir"><dc:Bounds x="1090" y="320" width="140" height="80" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="I_Resp_di" bpmnElement="I_Resp"><dc:Bounds x="1280" y="342" width="36" height="36" /><bpmndi:BPMNLabel><dc:Bounds x="1240" y="384" width="116" height="40" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="X_Conf_di" bpmnElement="X_Conf" isMarkerVisible="true"><dc:Bounds x="1360" y="335" width="50" height="50" /><bpmndi:BPMNLabel><dc:Bounds x="1340" y="300" width="90" height="27" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="E_Nao_di" bpmnElement="E_Nao"><dc:Bounds x="1367" y="422" width="36" height="36" /><bpmndi:BPMNLabel><dc:Bounds x="1217" y="430" width="140" height="27" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="X_Mod_di" bpmnElement="X_Mod" isMarkerVisible="true"><dc:Bounds x="1460" y="335" width="50" height="50" /><bpmndi:BPMNLabel><dc:Bounds x="1440" y="300" width="90" height="27" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_Deb_di" bpmnElement="T_Deb"><dc:Bounds x="1570" y="320" width="140" height="80" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_Fat_di" bpmnElement="T_Fat"><dc:Bounds x="1570" y="735" width="140" height="80" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="X_Merge_di" bpmnElement="X_Merge" isMarkerVisible="true"><dc:Bounds x="1760" y="335" width="50" height="50" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_ConfE_di" bpmnElement="T_ConfE"><dc:Bounds x="1850" y="320" width="140" height="80" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_Reg_di" bpmnElement="T_Reg"><dc:Bounds x="2040" y="500" width="140" height="80" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="E_Compra_di" bpmnElement="E_Compra"><dc:Bounds x="2230" y="522" width="36" height="36" /><bpmndi:BPMNLabel><dc:Bounds x="2190" y="564" width="116" height="40" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="S_Ciclo_di" bpmnElement="S_Ciclo"><dc:Bounds x="2400" y="902" width="36" height="36" /><bpmndi:BPMNLabel><dc:Bounds x="2360" y="944" width="116" height="40" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_Painel_di" bpmnElement="T_Painel"><dc:Bounds x="2480" y="500" width="140" height="80" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_Anal_di" bpmnElement="T_Anal"><dc:Bounds x="2670" y="880" width="140" height="80" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="X_Aj_di" bpmnElement="X_Aj" isMarkerVisible="true"><dc:Bounds x="2860" y="895" width="50" height="50" /><bpmndi:BPMNLabel><dc:Bounds x="2840" y="862" width="90" height="27" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="E_Mant_di" bpmnElement="E_Mant"><dc:Bounds x="2867" y="972" width="36" height="36" /><bpmndi:BPMNLabel><dc:Bounds x="2717" y="980" width="140" height="27" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="X_M2_di" bpmnElement="X_M2" isMarkerVisible="true"><dc:Bounds x="2960" y="895" width="50" height="50" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_Prop_di" bpmnElement="T_Prop"><dc:Bounds x="3050" y="880" width="140" height="80" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_Sim_di" bpmnElement="T_Sim"><dc:Bounds x="3240" y="500" width="140" height="80" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="X_Coer_di" bpmnElement="X_Coer" isMarkerVisible="true"><dc:Bounds x="3430" y="515" width="50" height="50" /><bpmndi:BPMNLabel><dc:Bounds x="3405" y="482" width="100" height="27" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_Apr_di" bpmnElement="T_Apr"><dc:Bounds x="3530" y="880" width="140" height="80" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_Pub_di" bpmnElement="T_Pub"><dc:Bounds x="3720" y="500" width="140" height="80" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="E_Pub_di" bpmnElement="E_Pub"><dc:Bounds x="3910" y="522" width="36" height="36" /><bpmndi:BPMNLabel><dc:Bounds x="3870" y="564" width="116" height="40" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DS_Base1_di" bpmnElement="DS_Base1"><dc:Bounds x="565" y="620" width="50" height="50" /><bpmndi:BPMNLabel><dc:Bounds x="530" y="672" width="120" height="27" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DS_Regras1_di" bpmnElement="DS_Regras1"><dc:Bounds x="755" y="620" width="50" height="50" /><bpmndi:BPMNLabel><dc:Bounds x="720" y="672" width="120" height="27" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DS_Base2_di" bpmnElement="DS_Base2"><dc:Bounds x="2300" y="620" width="50" height="50" /><bpmndi:BPMNLabel><dc:Bounds x="2265" y="672" width="120" height="27" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DS_Regras2_di" bpmnElement="DS_Regras2"><dc:Bounds x="3570" y="620" width="50" height="50" /><bpmndi:BPMNLabel><dc:Bounds x="3535" y="672" width="120" height="27" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="F01_di" bpmnElement="F01"><di:waypoint x="286" y="360" /><di:waypoint x="330" y="360" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F02_di" bpmnElement="F02"><di:waypoint x="400" y="400" /><di:waypoint x="400" y="540" /><di:waypoint x="520" y="540" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F03_di" bpmnElement="F03"><di:waypoint x="660" y="540" /><di:waypoint x="710" y="540" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F04_di" bpmnElement="F04"><di:waypoint x="850" y="540" /><di:waypoint x="900" y="540" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F05_di" bpmnElement="F05"><di:waypoint x="1040" y="540" /><di:waypoint x="1065" y="540" /><di:waypoint x="1065" y="360" /><di:waypoint x="1090" y="360" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F06_di" bpmnElement="F06"><di:waypoint x="1230" y="360" /><di:waypoint x="1280" y="360" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F07_di" bpmnElement="F07"><di:waypoint x="1316" y="360" /><di:waypoint x="1360" y="360" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F08_di" bpmnElement="F08"><di:waypoint x="1410" y="360" /><di:waypoint x="1460" y="360" /><bpmndi:BPMNLabel><dc:Bounds x="1418" y="342" width="30" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F09_di" bpmnElement="F09"><di:waypoint x="1385" y="385" /><di:waypoint x="1385" y="422" /><bpmndi:BPMNLabel><dc:Bounds x="1395" y="400" width="30" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F10_di" bpmnElement="F10"><di:waypoint x="1510" y="360" /><di:waypoint x="1570" y="360" /><bpmndi:BPMNLabel><dc:Bounds x="1515" y="342" width="36" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F11_di" bpmnElement="F11"><di:waypoint x="1485" y="385" /><di:waypoint x="1485" y="775" /><di:waypoint x="1570" y="775" /><bpmndi:BPMNLabel><dc:Bounds x="1492" y="600" width="162" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F12_di" bpmnElement="F12"><di:waypoint x="1710" y="360" /><di:waypoint x="1760" y="360" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F13_di" bpmnElement="F13"><di:waypoint x="1710" y="775" /><di:waypoint x="1785" y="775" /><di:waypoint x="1785" y="385" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F14_di" bpmnElement="F14"><di:waypoint x="1810" y="360" /><di:waypoint x="1850" y="360" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F15_di" bpmnElement="F15"><di:waypoint x="1990" y="360" /><di:waypoint x="2015" y="360" /><di:waypoint x="2015" y="540" /><di:waypoint x="2040" y="540" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F16_di" bpmnElement="F16"><di:waypoint x="2180" y="540" /><di:waypoint x="2230" y="540" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F17_di" bpmnElement="F17"><di:waypoint x="2436" y="920" /><di:waypoint x="2455" y="920" /><di:waypoint x="2455" y="540" /><di:waypoint x="2480" y="540" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F18_di" bpmnElement="F18"><di:waypoint x="2620" y="540" /><di:waypoint x="2645" y="540" /><di:waypoint x="2645" y="920" /><di:waypoint x="2670" y="920" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F19_di" bpmnElement="F19"><di:waypoint x="2810" y="920" /><di:waypoint x="2860" y="920" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F20_di" bpmnElement="F20"><di:waypoint x="2910" y="920" /><di:waypoint x="2960" y="920" /><bpmndi:BPMNLabel><dc:Bounds x="2915" y="902" width="30" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F21_di" bpmnElement="F21"><di:waypoint x="2885" y="945" /><di:waypoint x="2885" y="972" /><bpmndi:BPMNLabel><dc:Bounds x="2895" y="950" width="30" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F22_di" bpmnElement="F22"><di:waypoint x="3010" y="920" /><di:waypoint x="3050" y="920" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F23_di" bpmnElement="F23"><di:waypoint x="3190" y="920" /><di:waypoint x="3215" y="920" /><di:waypoint x="3215" y="540" /><di:waypoint x="3240" y="540" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F24_di" bpmnElement="F24"><di:waypoint x="3380" y="540" /><di:waypoint x="3430" y="540" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F25_di" bpmnElement="F25"><di:waypoint x="3480" y="540" /><di:waypoint x="3505" y="540" /><di:waypoint x="3505" y="920" /><di:waypoint x="3530" y="920" /><bpmndi:BPMNLabel><dc:Bounds x="3510" y="600" width="30" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F26_di" bpmnElement="F26"><di:waypoint x="3455" y="565" /><di:waypoint x="3455" y="1015" /><di:waypoint x="2985" y="1015" /><di:waypoint x="2985" y="945" /><bpmndi:BPMNLabel><dc:Bounds x="3462" y="980" width="30" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F27_di" bpmnElement="F27"><di:waypoint x="3670" y="920" /><di:waypoint x="3695" y="920" /><di:waypoint x="3695" y="540" /><di:waypoint x="3720" y="540" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F28_di" bpmnElement="F28"><di:waypoint x="3860" y="540" /><di:waypoint x="3910" y="540" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="MF1_di" bpmnElement="MF1"><di:waypoint x="268" y="160" /><di:waypoint x="268" y="342" /><bpmndi:BPMNLabel><dc:Bounds x="276" y="270" width="162" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="MF2_di" bpmnElement="MF2"><di:waypoint x="1140" y="320" /><di:waypoint x="1140" y="250" /><bpmndi:BPMNLabel><dc:Bounds x="1046" y="268" width="114" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="MF3_di" bpmnElement="MF3"><di:waypoint x="1298" y="250" /><di:waypoint x="1298" y="342" /><bpmndi:BPMNLabel><dc:Bounds x="1306" y="268" width="126" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="MF4_di" bpmnElement="MF4"><di:waypoint x="1920" y="320" /><di:waypoint x="1920" y="160" /><bpmndi:BPMNLabel><dc:Bounds x="1928" y="268" width="120" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DA1_di" bpmnElement="DA1"><di:waypoint x="590" y="620" /><di:waypoint x="590" y="580" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DA2_di" bpmnElement="DA2"><di:waypoint x="780" y="620" /><di:waypoint x="780" y="580" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DA3_di" bpmnElement="DA3"><di:waypoint x="2150" y="580" /><di:waypoint x="2300" y="635" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DA4_di" bpmnElement="DA4"><di:waypoint x="2350" y="635" /><di:waypoint x="2510" y="580" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DA5_di" bpmnElement="DA5"><di:waypoint x="3570" y="640" /><di:waypoint x="3320" y="580" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DA6_di" bpmnElement="DA6"><di:waypoint x="3760" y="580" /><di:waypoint x="3620" y="640" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="A1_di" bpmnElement="A1"><dc:Bounds x="1300" y="745" width="230" height="50" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="As_A1_di" bpmnElement="As_A1"><di:waypoint x="1530" y="770" /><di:waypoint x="1570" y="772" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="A2_di" bpmnElement="A2"><dc:Bounds x="3190" y="730" width="230" height="60" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="As_A2_di" bpmnElement="As_A2"><di:waypoint x="3440" y="555" /><di:waypoint x="3380" y="730" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="A3_di" bpmnElement="A3"><dc:Bounds x="2170" y="955" width="210" height="50" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="As_A3_di" bpmnElement="As_A3"><di:waypoint x="2405" y="930" /><di:waypoint x="2380" y="975" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="A4_di" bpmnElement="A4"><dc:Bounds x="240" y="880" width="330" height="60" /></bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
