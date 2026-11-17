@@ -9,16 +9,19 @@ Trabalho final de PCS3869: proposta de consultoria para integrar as informaçõe
 | Pasta / arquivo | O que é |
 |---|---|
 | [NuPay e cartão de crédito.pdf](NuPay%20e%20cart%C3%A3o%20de%20cr%C3%A9dito.pdf) | Apresentação do case. |
-| [item-a-proposta/](item-a-proposta/) | Item A: proposta de consultoria (rascunho v0) e BPMN/PNG do processo proposto. |
+| [NuPay e cartão de crédito - Entrega 3.pdf](NuPay%20e%20cart%C3%A3o%20de%20cr%C3%A9dito%20-%20Entrega%203.pdf) | Enunciado da entrega 3. |
+| [item-a-proposta/](item-a-proposta/) | Item A: proposta v1, cronograma, planilha de custos, anexo de alinhamento de taxas e BPMN/PNG do processo proposto. |
 | [item-c-processo/](item-c-processo/) | Item C: processo usado pelo grupo, atores e papéis (v1), com BPMN/PNG. |
-| [prompts/](prompts/) | Prompts usados com LLM: 01 desafios (zero shot) e 02 serviços (few shot). |
+| [prompts/](prompts/) | Prompts: 01 desafios (zero shot), 02 serviços (few shot), 03 custos (chain of thought), 04 auditor (persona). |
+| [auditoria/](auditoria/) | Auditoria cruzada entre LLMs (rodada 1: pacote para o auditor). |
 | [planejamento/cronograma-e-papeis.xlsx](planejamento/cronograma-e-papeis.xlsx) | Cronograma (uma entrega por semana até 01/12/2026), papéis e atores × papéis. |
 
 ## Diário
 
+| 2026-11-17 | — | Case | Enunciado da entrega 3 | NuPay e cartão de crédito - Entrega 3.pdf | — | 05c7936 |
 | Data | Autor | Item | O que foi feito | Arquivos | LLM | Commit |
 | --- | --- | --- | --- | --- | --- | --- |
-| 2026-11-17 | Lucas | Planejamento | Status do cronograma: S2 100%, S3 em andamento (auditoria e achados) | planejamento/cronograma-e-papeis.xlsx | — | (próximo) |
+| 2026-11-17 | Lucas | Planejamento | Status do cronograma: S2 100%, S3 em andamento (auditoria e achados) | planejamento/cronograma-e-papeis.xlsx | — | 4328eae |
 | 2026-11-17 | Rafael | Auditoria, Prompts | Prompt de auditor (Persona de Auditor) e pacote pronto para colar | prompts/04-auditor.md; auditoria/rodada-1/pacote-para-colar.md | — | df59a72 |
 | 2026-11-17 | Lucas, Ian | A | Proposta v1 (4 páginas): alinhamento de taxas, cronograma e investimento | item-a-proposta/proposta.md | Claude Opus 5.5 | 0944ebb |
 | 2026-11-17 | Ian | A | Anexo técnico: como funciona o alinhamento de taxas (fórmula, regras R1 a R6, exemplo) | item-a-proposta/alinhamento-de-taxas.md | Claude Opus 5.5 | 8fdec8d |
