@@ -18,7 +18,6 @@ Trabalho final de PCS3869: proposta de consultoria para integrar as informaçõe
 
 ## Diário
 
-| 2026-11-17 | — | Case | Enunciado da entrega 3 | NuPay e cartão de crédito - Entrega 3.pdf | — | 05c7936 |
 | Data | Autor | Item | O que foi feito | Arquivos | LLM | Commit |
 | --- | --- | --- | --- | --- | --- | --- |
 | 2026-11-17 | Lucas | Planejamento | Status do cronograma: S2 100%, S3 em andamento (auditoria e achados) | planejamento/cronograma-e-papeis.xlsx | — | 4328eae |
@@ -27,6 +26,7 @@ Trabalho final de PCS3869: proposta de consultoria para integrar as informaçõe
 | 2026-11-17 | Ian | A | Anexo técnico: como funciona o alinhamento de taxas (fórmula, regras R1 a R6, exemplo) | item-a-proposta/alinhamento-de-taxas.md | Claude Opus 5.5 | 8fdec8d |
 | 2026-11-17 | Rafael | A, Prompts | Planilha de custos com prompt chain of thought: 2.042 h, total R$ 522.824,50 | prompts/03-custos-cot.md; item-a-proposta/planilha-custos.xlsx | Claude Opus 5.5 | 3d74bc0 |
 | 2026-11-17 | Rafael | A | Cronograma da consultoria: 16 semanas, 4 marcos, caminho crítico | item-a-proposta/cronograma.md | Claude Opus 5.5 | 5ee41cd |
+| 2026-11-17 | — | Case | Enunciado da entrega 3 | NuPay e cartão de crédito - Entrega 3.pdf | — | 05c7936 |
 | 2026-11-17 | Lucas | B | Fechamento da semana 2 e tag `entrega-s2` | README.md | — | 32ab98c |
 | 2026-11-17 | Lucas | Planejamento | Status do cronograma atualizado: S1 100%, S2 80% (falta só esta tag) | planejamento/cronograma-e-papeis.xlsx | — | 29e2d41 |
 | 2026-11-17 | Ian | A | Rascunho v0 da proposta, com contexto, desafios, serviços e solução | item-a-proposta/proposta.md; solucao-processo.bpmn; solucao-processo.png | — | 2ccf17e |
