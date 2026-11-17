@@ -18,7 +18,8 @@ Trabalho final de PCS3869: proposta de consultoria para integrar as informaçõe
 
 | Data | Autor | Item | O que foi feito | Arquivos | LLM | Commit |
 | --- | --- | --- | --- | --- | --- | --- |
-| 2026-11-17 | Lucas, Ian | A | Proposta v1 (4 páginas): alinhamento de taxas, cronograma e investimento | item-a-proposta/proposta.md | Claude Opus 5.5 | (próximo) |
+| 2026-11-17 | Rafael | Auditoria, Prompts | Prompt de auditor (Persona de Auditor) e pacote pronto para colar | prompts/04-auditor.md; auditoria/rodada-1/pacote-para-colar.md | — | (próximo) |
+| 2026-11-17 | Lucas, Ian | A | Proposta v1 (4 páginas): alinhamento de taxas, cronograma e investimento | item-a-proposta/proposta.md | Claude Opus 5.5 | 0944ebb |
 | 2026-11-17 | Ian | A | Anexo técnico: como funciona o alinhamento de taxas (fórmula, regras R1 a R6, exemplo) | item-a-proposta/alinhamento-de-taxas.md | Claude Opus 5.5 | 8fdec8d |
 | 2026-11-17 | Rafael | A, Prompts | Planilha de custos com prompt chain of thought: 2.042 h, total R$ 522.824,50 | prompts/03-custos-cot.md; item-a-proposta/planilha-custos.xlsx | Claude Opus 5.5 | 3d74bc0 |
 | 2026-11-17 | Rafael | A | Cronograma da consultoria: 16 semanas, 4 marcos, caminho crítico | item-a-proposta/cronograma.md | Claude Opus 5.5 | 5ee41cd |
