@@ -18,7 +18,7 @@ Trabalho final de PCS3869: proposta de consultoria para integrar as informaçõe
 
 | Data | Autor | Item | O que foi feito | Arquivos | LLM | Commit |
 | --- | --- | --- | --- | --- | --- | --- |
-| 2026-11-17 | Lucas | B | Fechamento da semana 2 e tag `entrega-s2` | README.md | — | este commit |
+| 2026-11-17 | Lucas | B | Fechamento da semana 2 e tag `entrega-s2` | README.md | — | 32ab98c |
 | 2026-11-17 | Lucas | Planejamento | Status do cronograma atualizado: S1 100%, S2 80% (falta só esta tag) | planejamento/cronograma-e-papeis.xlsx | — | 29e2d41 |
 | 2026-11-17 | Ian | A | Rascunho v0 da proposta, com contexto, desafios, serviços e solução | item-a-proposta/proposta.md; solucao-processo.bpmn; solucao-processo.png | — | 2ccf17e |
 | 2026-11-17 | Ian | A, Prompts | Serviços S1 a S6 desenhados com prompt few shot (2 exemplos de outro setor) | prompts/02-servicos-few-shot.md | Claude Opus 5.5 | c6af074 |
